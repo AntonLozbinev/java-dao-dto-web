@@ -1,4 +1,4 @@
-package main.java.by.itstart.dto;
+package by.itstart.dto;
 
 import java.io.Serializable;
 

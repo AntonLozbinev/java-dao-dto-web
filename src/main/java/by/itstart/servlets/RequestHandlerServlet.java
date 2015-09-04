@@ -1,12 +1,12 @@
-package main.java.by.itstart.servlets;
+package by.itstart.servlets;
 
-import main.java.by.itstart.dao.CrudDao;
-import main.java.by.itstart.dao.DaoException;
-import main.java.by.itstart.dto.Student;
-import main.java.by.itstart.dto.Subject;
-import main.java.by.itstart.mysql.MySqlDaoFactory;
-import main.java.by.itstart.mysql.MySqlStudentDao;
-import main.java.by.itstart.mysql.MySqlSubjectDao;
+import by.itstart.dao.CrudDao;
+import by.itstart.dao.DaoException;
+import by.itstart.dto.Student;
+import by.itstart.dto.Subject;
+import by.itstart.mysql.MySqlDaoFactory;
+import by.itstart.mysql.MySqlStudentDao;
+import by.itstart.mysql.MySqlSubjectDao;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -108,7 +108,6 @@ public class RequestHandlerServlet extends HttpServlet {
 
     private void updateStudent(HttpServletRequest req, HttpServletResponse resp) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
-        req.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
         MySqlStudentDao dao = null;
         try {
@@ -139,7 +138,6 @@ public class RequestHandlerServlet extends HttpServlet {
 
     private void updateSubject(HttpServletRequest req, HttpServletResponse resp) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
-        req.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
         MySqlSubjectDao dao = null;
         try {

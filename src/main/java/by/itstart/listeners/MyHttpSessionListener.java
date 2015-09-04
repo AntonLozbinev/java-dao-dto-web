@@ -1,11 +1,11 @@
-package main.java.by.itstart.listeners;
+package by.itstart.listeners;
 
-import main.java.by.itstart.dao.DaoException;
-import main.java.by.itstart.dto.Student;
-import main.java.by.itstart.dto.Subject;
-import main.java.by.itstart.mysql.MySqlDaoFactory;
-import main.java.by.itstart.mysql.MySqlStudentDao;
-import main.java.by.itstart.mysql.MySqlSubjectDao;
+import by.itstart.dao.DaoException;
+import by.itstart.dto.Student;
+import by.itstart.dto.Subject;
+import by.itstart.mysql.MySqlDaoFactory;
+import by.itstart.mysql.MySqlStudentDao;
+import by.itstart.mysql.MySqlSubjectDao;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;

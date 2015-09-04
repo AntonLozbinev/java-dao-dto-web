@@ -1,9 +1,9 @@
-package main.java.by.itstart.mysql;
+package by.itstart.mysql;
 
-import main.java.by.itstart.dao.CrudDao;
-import main.java.by.itstart.dao.DaoException;
-import main.java.by.itstart.dao.DaoFactory;
-import main.java.by.itstart.dto.*;
+import by.itstart.dao.CrudDao;
+import by.itstart.dao.DaoException;
+import by.itstart.dao.DaoFactory;
+import by.itstart.dto.*;
 
 import java.io.IOException;
 import java.io.InputStream;

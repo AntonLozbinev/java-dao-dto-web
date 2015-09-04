@@ -1,4 +1,4 @@
-package main.java.by.itstart.dao;
+package by.itstart.dao;
 
 public class DaoException extends Exception {
 

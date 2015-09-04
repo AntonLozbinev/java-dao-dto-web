@@ -5,12 +5,12 @@
     </welcome-file-list>
 
     <listener>
-        <listener-class>main.java.itstart.listeners.MyHttpSessionListener</listener-class>
+        <listener-class>by.itstart.listeners.MyHttpSessionListener</listener-class>
     </listener>
 
     <servlet>
         <servlet-name>requestHandler</servlet-name>
-        <servlet-class>main.java.itstart.servlets.RequestHandlerServlet</servlet-class>
+        <servlet-class>by.itstart.servlets.RequestHandlerServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

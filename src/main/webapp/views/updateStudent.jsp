@@ -1,8 +1,8 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="utf-8" %>
 
 <html>
 <head>
-    <title>Subject update form</title>
+    <title>Student update form</title>
 </head>
 <body>
 <form action='${pageContext.request.contextPath}/handler' method='POST'>
@@ -10,7 +10,7 @@
         <caption>Заполните форму</caption>
         <tr>
             <td align='right' valign='top'>
-                Subject id:
+                Student id:
             </td>
             <td>
                 <input type='text' name='id'>
@@ -18,24 +18,32 @@
         </tr>
         <tr>
             <td align='right' valign='top'>
-                Student id:
+                Name:
             </td>
             <td>
-                <input type='text' name='st_id'>
+                <input type='text' name='firstName'>
             </td>
         </tr>
         <tr>
             <td align='right' valign='top'>
-                Title id:
+                Surname:
             </td>
             <td>
-                <input type='text' name='title'>
+                <input type='text' name='secondName'>
+            </td>
+        </tr>
+        <tr>
+            <td align='right' valign='top'>
+                Year:
+            </td>
+            <td>
+                <input type='text' name='enterYear'>
             </td>
         </tr>
         <tr>
             <td align='center' colspan='2'>
                 <input type='submit' value='Update'>
-                <input type='hidden' value='subUpdate' name='request'>
+                <input type='hidden' value='stUpdate' name='request'>
             </td>
         </tr>
     </table>

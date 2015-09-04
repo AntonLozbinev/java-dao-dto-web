@@ -1,7 +1,7 @@
-package main.java.by.itstart.mysql;
+package by.itstart.mysql;
 
-import main.java.by.itstart.dao.AbstractJdbcDao;
-import main.java.by.itstart.dto.Student;
+import by.itstart.dao.AbstractJdbcDao;
+import by.itstart.dto.Student;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

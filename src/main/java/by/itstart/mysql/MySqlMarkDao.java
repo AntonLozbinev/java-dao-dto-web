@@ -1,8 +1,8 @@
-package main.java.by.itstart.mysql;
+package by.itstart.mysql;
 
-import main.java.by.itstart.dao.AbstractJdbcDao;
-import main.java.by.itstart.dao.DaoException;
-import main.java.by.itstart.dto.Mark;
+import by.itstart.dao.AbstractJdbcDao;
+import by.itstart.dao.DaoException;
+import by.itstart.dto.Mark;
 
 
 import java.sql.Connection;
