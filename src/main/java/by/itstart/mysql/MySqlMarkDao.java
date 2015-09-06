@@ -35,7 +35,7 @@ public class MySqlMarkDao extends AbstractJdbcDao<Mark> {
 
     @Override
     protected String getDeleteQuery() {
-        return "DELETE FROM mark WHERE id = ?;";
+        return "DELETE FROM mark WHERE subject_id = ?;";
     }
 
     @Override

@@ -24,7 +24,7 @@ public class MySqlSubjectDao extends AbstractJdbcDao<Subject> {
 
     @Override
     protected String getUpdateQuery() {
-        return "UPDATE subject SET student_id, title WHERE id = ?;";
+        return "UPDATE subject SET student_id = ?, title = ? WHERE id = ?;";
     }
 
     @Override
@@ -61,6 +61,14 @@ public class MySqlSubjectDao extends AbstractJdbcDao<Subject> {
         statement.setInt(1, object.getStudentId());
         statement.setString(2, object.getTitle());
         statement.setInt(3, object.getId());
+    }
+
+    @Override
+    public boolean delete(int id) throws DaoException {
+        DaoFactory factory = new MySqlDaoFactory();
+        MySqlMarkDao dao = (MySqlMarkDao) factory.getDao(getConnection(), Mark.class);
+        dao.delete(id);
+        return super.delete(id);
     }
 
     public List<Subject> getAllWithMarksByStudentId(int id) throws DaoException {
