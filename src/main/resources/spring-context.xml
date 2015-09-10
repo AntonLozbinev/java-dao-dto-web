@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <bean id="daoFactory" class="by.itstart.mysql.MySqlDaoFactory"/>
+    <bean id="connection" factory-bean="daoFactory" factory-method="getConnection" destroy-method="close"/>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource" destroy-method="closeConnection">
+        <constructor-arg ref="connection"/>
+        <constructor-arg value="false"/>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean  id="markDao" factory-bean="daoFactory" factory-method="getDao" destroy-method="closeDao">
+        <constructor-arg>
+            <bean factory-bean="dataSource" factory-method="getConnection" destroy-method="close"/>
+        </constructor-arg>
+        <constructor-arg value="by.itstart.dto.Mark"/>
+    </bean>
+    <bean id="subjectDao" factory-bean="daoFactory" factory-method="getDao" destroy-method="closeDao">
+        <constructor-arg>
+            <bean factory-bean="dataSource" factory-method="getConnection" destroy-method="close"/>
+        </constructor-arg>
+        <constructor-arg value="by.itstart.dto.Subject"/>
+    </bean>
+    <bean id="studentDao" factory-bean="daoFactory" factory-method="getDao" destroy-method="closeDao">
+        <constructor-arg>
+            <bean factory-bean="dataSource" factory-method="getConnection" destroy-method="close"/>
+        </constructor-arg>
+        <constructor-arg value="by.itstart.dto.Student"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

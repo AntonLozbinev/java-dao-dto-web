@@ -1,6 +1,6 @@
 package by.itstart.mysql;
 
-import by.itstart.dao.CrudDao;
+import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dao.DaoFactory;
 import by.itstart.dto.*;
@@ -22,19 +22,19 @@ public class MySqlDaoFactory implements DaoFactory {
         daos = new HashMap<>();
         daos.put(Student.class, new DaoCreater() {
             @Override
-            public CrudDao create(Connection connection) {
+            public GenericDao create(Connection connection) {
                 return new MySqlStudentDao(connection);
             }
         });
         daos.put(Subject.class, new DaoCreater() {
             @Override
-            public CrudDao create(Connection connection) {
+            public GenericDao create(Connection connection) {
                 return new MySqlSubjectDao(connection);
             }
         });
         daos.put(Mark.class, new DaoCreater() {
             @Override
-            public CrudDao create(Connection connection) {
+            public GenericDao create(Connection connection) {
                 return new MySqlMarkDao(connection);
             }
         });
@@ -59,7 +59,7 @@ public class MySqlDaoFactory implements DaoFactory {
     }
 
     @Override
-    public CrudDao getDao(Connection connection, Class dtoClass) {
+    public GenericDao getDao(Connection connection, Class dtoClass) {
         DaoCreater daoCreater = daos.get(dtoClass);
         return daoCreater.create(connection);
     }

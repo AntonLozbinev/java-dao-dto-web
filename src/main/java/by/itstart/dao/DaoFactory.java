@@ -5,10 +5,10 @@ import java.sql.Connection;
 public interface DaoFactory {
 
     interface DaoCreater {
-        CrudDao create(Connection connection);
+        GenericDao create(Connection connection);
     }
 
     Connection getConnection() throws DaoException;
 
-    CrudDao getDao(Connection connection, Class dtoClass);
+    GenericDao getDao(Connection connection, Class dtoClass);
 }

@@ -71,6 +71,7 @@ public class MySqlSubjectDao extends AbstractJdbcDao<Subject> {
         return super.delete(id);
     }
 
+    @Override
     public List<Subject> getAllWithMarksByStudentId(int id) throws DaoException {
         List<Subject> subjects;
         String sql = getSelectQuery() + " WHERE student_id = ?;";
@@ -91,6 +92,7 @@ public class MySqlSubjectDao extends AbstractJdbcDao<Subject> {
         return subjects;
     }
 
+    @Override
     public List<Subject> getAllByStudentId(int id) throws DaoException {
         List<Subject> subjects;
         String sql = getSelectQuery() + " WHERE student_id = ?;";

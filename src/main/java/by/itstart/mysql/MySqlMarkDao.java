@@ -67,6 +67,7 @@ public class MySqlMarkDao extends AbstractJdbcDao<Mark> {
         statement.setInt(4, object.getId());
     }
 
+    @Override
     public List<Mark> getAllBySubjectId(int id) throws DaoException {
         List<Mark> marks;
         String sql = getSelectQuery() + " WHERE subject_id = ?;";

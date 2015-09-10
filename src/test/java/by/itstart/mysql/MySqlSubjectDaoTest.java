@@ -1,43 +1,41 @@
 package by.itstart.mysql;
 
+import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dto.Subject;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:spring-context.xml"})
+@SuppressWarnings("unchecked")
+@Transactional
 public class MySqlSubjectDaoTest {
 
-    private static MySqlDaoFactory factory;
-    private static MySqlSubjectDao subjectDao;
-    private static Connection connection;
+    @Autowired
+    private GenericDao subjectDao;
     private static Subject subject;
 
     @BeforeClass
     public static void setUp() throws DaoException, SQLException {
-        factory = new MySqlDaoFactory();
-        connection = factory.getConnection();
-        connection.setAutoCommit(false);
-        subjectDao = (MySqlSubjectDao) factory.getDao(connection, Subject.class);
         subject = new Subject();
         subject.setId(1);
         subject.setStudentId(1);
         subject.setTitle("Анатомия");
     }
 
-    @AfterClass
-    public static void tearDown() throws DaoException, SQLException {
-        connection.rollback();
-        subjectDao.closeDao();
-    }
-
     @Test
     public void testRead() throws DaoException {
-        Subject subject = subjectDao.read(1);
+        Subject subject = (Subject) subjectDao.read(1);
         assertNotNull(subject);
         assertNotNull(subject.getId());
     }
@@ -52,9 +50,9 @@ public class MySqlSubjectDaoTest {
 
     @Test
     public void testUpdate() throws DaoException {
-        String titleBefore = subjectDao.read(1).getTitle();
+        String titleBefore = ((Subject)subjectDao.read(1)).getTitle();
         assertTrue(subjectDao.update(subject));
-        String titleAfter = subjectDao.read(1).getTitle();
+        String titleAfter = ((Subject)subjectDao.read(1)).getTitle();
         assertNotEquals(titleBefore, titleAfter);
     }
 

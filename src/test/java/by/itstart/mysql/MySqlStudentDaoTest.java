@@ -1,28 +1,32 @@
 package by.itstart.mysql;
 
+import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dto.Student;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:spring-context.xml"})
+@SuppressWarnings("unchecked")
+@Transactional
 public class MySqlStudentDaoTest {
 
-    private static MySqlDaoFactory factory;
-    private static MySqlStudentDao studentDao;
-    private static Connection connection;
+    @Autowired
+    private GenericDao studentDao;
     private static Student student;
 
     @BeforeClass
     public static void setUp() throws DaoException, SQLException {
-        factory = new MySqlDaoFactory();
-        connection = factory.getConnection();
-        connection.setAutoCommit(false);
-        studentDao = (MySqlStudentDao) factory.getDao(connection, Student.class);
         student = new Student();
         student.setId(1);
         student.setFirstName("Anton");
@@ -30,15 +34,9 @@ public class MySqlStudentDaoTest {
         student.setEnterYear(2015);
     }
 
-    @AfterClass
-    public static void tearDown() throws DaoException, SQLException {
-        connection.rollback();
-        studentDao.closeDao();
-    }
-
     @Test
     public void testRead() throws DaoException {
-        Student student = studentDao.read(1);
+        Student student = (Student) studentDao.read(1);
         assertNotNull(student);
         assertNotNull(student.getId());
     }
@@ -53,9 +51,9 @@ public class MySqlStudentDaoTest {
 
     @Test
     public void testUpdate() throws DaoException {
-        String nameBefore = studentDao.read(1).getFirstName();
+        String nameBefore = ((Student)studentDao.read(1)).getFirstName();
         assertTrue(studentDao.update(student));
-        String nameAfter = studentDao.read(1).getFirstName();
+        String nameAfter = ((Student)studentDao.read(1)).getFirstName();
         assertNotEquals(nameBefore, nameAfter);
     }
 

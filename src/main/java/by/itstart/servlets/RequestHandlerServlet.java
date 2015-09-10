@@ -1,12 +1,13 @@
 package by.itstart.servlets;
 
-import by.itstart.dao.CrudDao;
+import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dto.Student;
 import by.itstart.dto.Subject;
-import by.itstart.mysql.MySqlDaoFactory;
 import by.itstart.mysql.MySqlStudentDao;
 import by.itstart.mysql.MySqlSubjectDao;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,6 +24,7 @@ public class RequestHandlerServlet extends HttpServlet {
     private final String DELETE = "delete";
     private final String UPDATE = "update";
     private final String CREATE = "create";
+    private ApplicationContext context = new ClassPathXmlApplicationContext("spring-context.xml");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -42,31 +44,31 @@ public class RequestHandlerServlet extends HttpServlet {
                 if (action.startsWith("student")) {
                     switch (action.split("_")[1]) {
                         case SHOW:
-                            show(req, resp, Student.class);
+                            show(req, resp, "studentDao");
                             break;
                         case SHOW_ALL:
-                            showAll(req, resp, Student.class);
+                            showAll(req, resp, "studentDao");
                             break;
                         case UPDATE:
                             req.getRequestDispatcher("/views/updateStudent.jsp").forward(req, resp);
                             break;
                         case DELETE:
-                            delete(req, resp, Student.class);
+                            delete(req, resp, "studentDao");
                             break;
                     }
                 } else if (action.startsWith("subject")) {
                     switch (action.split("_")[1]) {
                         case SHOW:
-                            show(req, resp, Subject.class);
+                            show(req, resp, "subjectDao");
                             break;
                         case SHOW_ALL:
-                            showAll(req, resp, Subject.class);
+                            showAll(req, resp, "subjectDao");
                             break;
                         case UPDATE:
                             req.getRequestDispatcher("/views/updateSubject.jsp").forward(req, resp);
                             break;
                         case DELETE:
-                            delete(req, resp, Subject.class);
+                            delete(req, resp, "subjectDao");
                             break;
                         case CREATE:
                             req.getRequestDispatcher("/views/addSubject.jsp").forward(req, resp);
@@ -109,7 +111,6 @@ public class RequestHandlerServlet extends HttpServlet {
     private void updateStudent(HttpServletRequest req, HttpServletResponse resp) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter out = resp.getWriter();
-        MySqlStudentDao dao = null;
         try {
             int id = Integer.parseInt(req.getParameter("id"));
             String firstName = req.getParameter("firstName");
@@ -120,8 +121,7 @@ public class RequestHandlerServlet extends HttpServlet {
             student.setFirstName(firstName);
             student.setSecondName(secondName);
             student.setEnterYear(enterYear);
-            MySqlDaoFactory factory = new MySqlDaoFactory();
-            dao = (MySqlStudentDao) factory.getDao(factory.getConnection(), Student.class);
+            MySqlStudentDao dao = (MySqlStudentDao) context.getBean("studentDao");
             dao.update(student);
             req.setAttribute("result", "<p>Student with id" + id + " was updated</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
@@ -130,16 +130,12 @@ public class RequestHandlerServlet extends HttpServlet {
             out.println("<a href='../index.jsp'>На главную</a>");
         } finally {
             out.close();
-            if (dao != null) {
-                dao.closeDao();
-            }
         }
     }
 
     private void updateSubject(HttpServletRequest req, HttpServletResponse resp) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter out = resp.getWriter();
-        MySqlSubjectDao dao = null;
         try {
             int id = Integer.parseInt(req.getParameter("id"));
             int st_id = Integer.parseInt(req.getParameter("st_id"));
@@ -148,8 +144,7 @@ public class RequestHandlerServlet extends HttpServlet {
             subject.setId(id);
             subject.setStudentId(st_id);
             subject.setTitle(title);
-            MySqlDaoFactory factory = new MySqlDaoFactory();
-            dao = (MySqlSubjectDao) factory.getDao(factory.getConnection(), Subject.class);
+            MySqlSubjectDao dao = (MySqlSubjectDao) context.getBean("subjectDao");
             dao.update(subject);
             req.setAttribute("result", "<p>Subject with id" + id + " was updated</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
@@ -158,9 +153,6 @@ public class RequestHandlerServlet extends HttpServlet {
             out.println("<a href='../index.jsp'>На главную</a>");
         } finally {
             out.close();
-            if (dao != null) {
-                dao.closeDao();
-            }
         }
     }
 
@@ -168,7 +160,6 @@ public class RequestHandlerServlet extends HttpServlet {
         resp.setContentType("text/html;charset=utf-8");
         req.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
-        MySqlSubjectDao dao = null;
         try {
             int id = Integer.parseInt(req.getParameter("id"));
             int st_id = Integer.parseInt(req.getParameter("st_id"));
@@ -177,8 +168,7 @@ public class RequestHandlerServlet extends HttpServlet {
             subject.setId(id);
             subject.setStudentId(st_id);
             subject.setTitle(title);
-            MySqlDaoFactory factory = new MySqlDaoFactory();
-            dao = (MySqlSubjectDao) factory.getDao(factory.getConnection(), Subject.class);
+            MySqlSubjectDao dao = (MySqlSubjectDao) context.getBean("subjectDao");
             dao.insert(subject);
             req.setAttribute("result", "<p>Subject with id" + id + " was created</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
@@ -187,85 +177,63 @@ public class RequestHandlerServlet extends HttpServlet {
             out.println("<a href='../index.jsp'>На главную</a>");
         } finally {
             out.close();
-            if (dao != null) {
-                dao.closeDao();
-            }
         }
     }
 
-    private void show (HttpServletRequest req, HttpServletResponse resp, Class dtoClass) throws IOException, DaoException {
+    private void show (HttpServletRequest req, HttpServletResponse resp, String daoType) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter out = resp.getWriter();
-        CrudDao dao = null;
         try {
             int id = Integer.parseInt(req.getParameter("id"));
-            MySqlDaoFactory factory = new MySqlDaoFactory();
-            dao = factory.getDao(factory.getConnection(), dtoClass);
+            GenericDao dao = (GenericDao) context.getBean(daoType);
             req.setAttribute("object", dao.read(id));
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
-            out.println("<p>Can not select " + dtoClass.getSimpleName() + "</p>");
+            out.println("<p>Can not select object</p>");
             out.println("<a href='index.jsp'>На главную</a>");
         } finally {
             out.close();
-            if (dao != null) {
-                dao.closeDao();
-            }
         }
     }
 
-    private void showAll(HttpServletRequest req, HttpServletResponse resp, Class dtoClass) throws IOException, DaoException {
+    private void showAll(HttpServletRequest req, HttpServletResponse resp, String daoType) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter out = resp.getWriter();
-        MySqlDaoFactory factory = new MySqlDaoFactory();
-        MySqlStudentDao studentDao = null;
-        MySqlSubjectDao subjectDao = null;
         List<? extends Object> objects = null;
         try {
-            if (dtoClass == Student.class) {
-                studentDao = (MySqlStudentDao) factory.getDao(factory.getConnection(), dtoClass);
+            if (daoType.startsWith("student")) {
+                MySqlStudentDao studentDao = (MySqlStudentDao) context.getBean(daoType);
                 objects =  studentDao.getAll();
             }
-            if (dtoClass == Subject.class) {
+            if (daoType.startsWith("subject")) {
                 int id = Integer.parseInt(req.getParameter("id"));
-                subjectDao = (MySqlSubjectDao) factory.getDao(factory.getConnection(), dtoClass);
+                MySqlSubjectDao subjectDao = (MySqlSubjectDao) context.getBean(daoType);
                 objects = subjectDao.getAllByStudentId(id);
             }
             req.setAttribute("objects", objects);
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
-            out.println("<p>Can not select all students</p>");
+            out.println("<p>Can not select all</p>");
             out.println("<a href='index.jsp'>На главную</a>");
         } finally {
             out.close();
-            if (studentDao != null) {
-                studentDao.closeDao();
-            }
-            if (subjectDao != null) {
-                subjectDao.closeDao();
-            }
         }
     }
 
-    private void delete(HttpServletRequest req, HttpServletResponse resp, Class dtoClass) throws IOException, DaoException {
+    private void delete(HttpServletRequest req, HttpServletResponse resp, String daoType) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter out = resp.getWriter();
-        CrudDao dao = null;
         try {
             int id = Integer.parseInt(req.getParameter("id"));
-            MySqlDaoFactory factory = new MySqlDaoFactory();
-            dao = factory.getDao(factory.getConnection(), dtoClass);
+            GenericDao dao = (GenericDao) context.getBean(daoType);
             dao.delete(id);
-            req.setAttribute("result", "<p>" + dtoClass.getSimpleName() + " with id" + id + " was deleted</p>");
+            req.setAttribute("result", "<p>Object with id" + id + " was deleted</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
             out.println("<p>Can not delete student</p>");
             out.println("<a href='index.jsp'>На главную</a>");
         }finally {
             out.close();
-            if (dao != null) {
-                dao.closeDao();
-            }
         }
     }
 }

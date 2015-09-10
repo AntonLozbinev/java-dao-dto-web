@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.List;
 
-public abstract class AbstractJdbcDao<T> implements CrudDao<T> {
+public abstract class AbstractJdbcDao<T> implements GenericDao<T> {
 
     private Connection connection;
     private PreparedStatement readStatement;
@@ -114,6 +114,21 @@ public abstract class AbstractJdbcDao<T> implements CrudDao<T> {
             throw new DaoException("Can not select all objects", e);
         }
         return objects;
+    }
+
+    @Override
+    public List<T> getAllWithMarksByStudentId(int id) throws DaoException {
+        return null;
+    }
+
+    @Override
+    public List<T> getAllBySubjectId(int id) throws DaoException {
+        return null;
+    }
+
+    @Override
+    public List<T> getAllByStudentId(int id) throws DaoException {
+        return null;
     }
 
     public void closeDao() throws DaoException {

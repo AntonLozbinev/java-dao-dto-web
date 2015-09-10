@@ -1,43 +1,42 @@
 package by.itstart.mysql;
 
+import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dto.Mark;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:spring-context.xml"})
+@SuppressWarnings("unchecked")
+@Transactional
 public class MySqlMarkDaoTest {
 
-    private static MySqlDaoFactory factory;
-    private static MySqlMarkDao markDao;
-    private static Connection connection;
+    @Autowired
+    private GenericDao markDao;
     private static Mark mark;
 
     @BeforeClass
     public static void setUp() throws DaoException, SQLException {
-        factory = new MySqlDaoFactory();
-        connection = factory.getConnection();
-        connection.setAutoCommit(false);
-        markDao = (MySqlMarkDao) factory.getDao(connection, Mark.class);
         mark = new Mark();
         mark.setId(1);
         mark.setStudentId(1);
         mark.setSubjectId(1);
-    }
-
-    @AfterClass
-    public static void tearDown() throws DaoException, SQLException {
-        connection.rollback();
-        markDao.closeDao();
+        mark.setMark(1);
     }
 
     @Test
     public void testRead() throws DaoException {
-        Mark mark = markDao.read(1);
+        Mark mark = (Mark) markDao.read(1);
         assertNotNull(mark);
         assertNotNull(mark.getId());
     }
@@ -52,9 +51,9 @@ public class MySqlMarkDaoTest {
 
     @Test
     public void testUpdate() throws DaoException {
-        int markBefore = markDao.read(1).getMark();
+        int markBefore = ((Mark)markDao.read(1)).getMark();
         assertTrue(markDao.update(mark));
-        int markAfter = markDao.read(1).getMark();
+        int markAfter = ((Mark)markDao.read(1)).getMark();
         assertNotEquals(markBefore, markAfter);
     }
 
