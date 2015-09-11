@@ -8,6 +8,15 @@
         <listener-class>by.itstart.listeners.MyHttpSessionListener</listener-class>
     </listener>
 
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring-context.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>requestHandler</servlet-name>
         <servlet-class>by.itstart.servlets.RequestHandlerServlet</servlet-class>
@@ -17,4 +26,5 @@
         <servlet-name>requestHandler</servlet-name>
         <url-pattern>/handler</url-pattern>
     </servlet-mapping>
+
 </web-app>

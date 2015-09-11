@@ -4,10 +4,9 @@ import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dto.Student;
 import by.itstart.dto.Subject;
-import by.itstart.mysql.MySqlStudentDao;
-import by.itstart.mysql.MySqlSubjectDao;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,7 +23,13 @@ public class RequestHandlerServlet extends HttpServlet {
     private final String DELETE = "delete";
     private final String UPDATE = "update";
     private final String CREATE = "create";
-    private ApplicationContext context = new ClassPathXmlApplicationContext("spring-context.xml");
+
+    @Autowired
+    @Qualifier("studentDao")
+    private GenericDao studentDao;
+    @Autowired
+    @Qualifier("subjectDao")
+    private GenericDao subjectDao;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -35,6 +40,12 @@ public class RequestHandlerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         requestHandler(req, resp);
         formsHandler(req, resp);
+    }
+
+    @Override
+    public void init() throws ServletException {
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext (this);
+        super.init();
     }
 
     private void requestHandler(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
@@ -80,8 +91,7 @@ public class RequestHandlerServlet extends HttpServlet {
             }
         } catch (DaoException e) {
             e.printStackTrace();
-        }
-    }
+        }    }
 
     private void formsHandler(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final String ST_UPDATE = "stUpdate";
@@ -121,8 +131,7 @@ public class RequestHandlerServlet extends HttpServlet {
             student.setFirstName(firstName);
             student.setSecondName(secondName);
             student.setEnterYear(enterYear);
-            MySqlStudentDao dao = (MySqlStudentDao) context.getBean("studentDao");
-            dao.update(student);
+            studentDao.update(student);
             req.setAttribute("result", "<p>Student with id" + id + " was updated</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
@@ -144,8 +153,7 @@ public class RequestHandlerServlet extends HttpServlet {
             subject.setId(id);
             subject.setStudentId(st_id);
             subject.setTitle(title);
-            MySqlSubjectDao dao = (MySqlSubjectDao) context.getBean("subjectDao");
-            dao.update(subject);
+            subjectDao.update(subject);
             req.setAttribute("result", "<p>Subject with id" + id + " was updated</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
@@ -168,8 +176,7 @@ public class RequestHandlerServlet extends HttpServlet {
             subject.setId(id);
             subject.setStudentId(st_id);
             subject.setTitle(title);
-            MySqlSubjectDao dao = (MySqlSubjectDao) context.getBean("subjectDao");
-            dao.insert(subject);
+            subjectDao.insert(subject);
             req.setAttribute("result", "<p>Subject with id" + id + " was created</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
@@ -185,8 +192,12 @@ public class RequestHandlerServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             int id = Integer.parseInt(req.getParameter("id"));
-            GenericDao dao = (GenericDao) context.getBean(daoType);
-            req.setAttribute("object", dao.read(id));
+            if (daoType.startsWith("student")) {
+                req.setAttribute("object", studentDao.read(id));
+            }
+            if (daoType.startsWith("subject")) {
+                req.setAttribute("object", subjectDao.read(id));
+            }
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
             out.println("<p>Can not select object</p>");
@@ -202,12 +213,10 @@ public class RequestHandlerServlet extends HttpServlet {
         List<? extends Object> objects = null;
         try {
             if (daoType.startsWith("student")) {
-                MySqlStudentDao studentDao = (MySqlStudentDao) context.getBean(daoType);
                 objects =  studentDao.getAll();
             }
             if (daoType.startsWith("subject")) {
                 int id = Integer.parseInt(req.getParameter("id"));
-                MySqlSubjectDao subjectDao = (MySqlSubjectDao) context.getBean(daoType);
                 objects = subjectDao.getAllByStudentId(id);
             }
             req.setAttribute("objects", objects);
@@ -225,8 +234,12 @@ public class RequestHandlerServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         try {
             int id = Integer.parseInt(req.getParameter("id"));
-            GenericDao dao = (GenericDao) context.getBean(daoType);
-            dao.delete(id);
+            if (daoType.startsWith("student")) {
+                studentDao.delete(id);
+            }
+            if (daoType.startsWith("subject")) {
+                subjectDao.delete(id);
+            }
             req.setAttribute("result", "<p>Object with id" + id + " was deleted</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
         } catch (DaoException | NumberFormatException | ServletException e) {
