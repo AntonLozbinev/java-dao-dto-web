@@ -4,6 +4,7 @@ import by.itstart.dao.GenericDao;
 import by.itstart.dao.DaoException;
 import by.itstart.dto.Student;
 import by.itstart.dto.Subject;
+import by.itstart.hibernate.HibernateSubjectDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -156,7 +157,7 @@ public class RequestHandlerServlet extends HttpServlet {
             subjectDao.update(subject);
             req.setAttribute("result", "<p>Subject with id" + id + " was updated</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
-        } catch (DaoException | NumberFormatException | ServletException e) {
+        } catch (Exception e) {
             out.println("<p>Can not update subject</p>");
             out.println("<a href='../index.jsp'>На главную</a>");
         } finally {
@@ -242,7 +243,8 @@ public class RequestHandlerServlet extends HttpServlet {
             }
             req.setAttribute("result", "<p>Object with id" + id + " was deleted</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
-        } catch (DaoException | NumberFormatException | ServletException e) {
+        } catch (Exception e) {
+            out.print(e.getMessage());
             out.println("<p>Can not delete student</p>");
             out.println("<a href='index.jsp'>На главную</a>");
         }finally {

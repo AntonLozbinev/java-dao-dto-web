@@ -1,8 +1,15 @@
 package by.itstart.dto;
 
+import org.hibernate.annotations.*;
+
+import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.List;
 
+@Entity
+@Table(name="subject", catalog="student_db")
 public class Subject implements Serializable{
 
     private Integer id = null;
@@ -10,6 +17,14 @@ public class Subject implements Serializable{
     private Integer studentId;
     private List<Mark> marks;
 
+    public Subject() {
+    }
+
+    public Subject(Integer id) {
+        this.id = id;
+    }
+
+    @Column(name="student_id")
     public Integer getStudentId() {
         return studentId;
     }
@@ -18,6 +33,10 @@ public class Subject implements Serializable{
         this.studentId = studentId;
     }
 
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
+    @Column(name="ID")
     public Integer getId() {
         return id;
     }
@@ -26,6 +45,7 @@ public class Subject implements Serializable{
         this.id = id;
     }
 
+    @Column(name="title")
     public String getTitle() {
         return title;
     }
@@ -34,6 +54,8 @@ public class Subject implements Serializable{
         this.title = title;
     }
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subject_id")
     public List<Mark> getMarks() {
         return marks;
     }
@@ -45,5 +67,25 @@ public class Subject implements Serializable{
     @Override
     public String toString() {
         return id + ". " + title + " of student with id " + studentId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Subject that = (Subject) o;
+
+        if (id != that.id) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        return result;
     }
 }

@@ -1,7 +1,14 @@
 package by.itstart.dto;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name="mark", catalog="student_db")
 public class Mark implements Serializable{
 
     private Integer id = null;
@@ -9,14 +16,13 @@ public class Mark implements Serializable{
     private Integer subjectId;
     private int mark;
 
-    public Integer getStudentId() {
-        return studentId;
+    public Mark() {
     }
 
-    public void setStudentId(Integer studentId) {
-        this.studentId = studentId;
-    }
-
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy="increment")
+    @Column(name="ID")
     public Integer getId() {
         return id;
     }
@@ -25,6 +31,16 @@ public class Mark implements Serializable{
         this.id = id;
     }
 
+    @Column(name="student_id")
+    public Integer getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Integer studentId) {
+        this.studentId = studentId;
+    }
+
+    @Column(name="subject_id")
     public Integer getSubjectId() {
         return subjectId;
     }
@@ -33,11 +49,32 @@ public class Mark implements Serializable{
         this.subjectId = subjectId;
     }
 
+    @Column(name="mark")
     public int getMark() {
         return mark;
     }
 
     public void setMark(int mark) {
         this.mark = mark;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Mark that = (Mark) o;
+
+        if (id != that.id) return false;
+        if (mark != that.mark) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + mark;
+        return result;
     }
 }

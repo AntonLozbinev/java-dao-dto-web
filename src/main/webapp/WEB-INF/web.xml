@@ -4,10 +4,6 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-    <listener>
-        <listener-class>by.itstart.listeners.MyHttpSessionListener</listener-class>
-    </listener>
-
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:spring-context.xml</param-value>

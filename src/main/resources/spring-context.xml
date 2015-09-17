@@ -4,36 +4,55 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <bean id="daoFactory" class="by.itstart.mysql.MySqlDaoFactory"/>
-    <bean id="connection" factory-bean="daoFactory" factory-method="getConnection" destroy-method="close"/>
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource" destroy-method="closeConnection">
-        <constructor-arg ref="connection"/>
-        <constructor-arg value="false"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/student_db" />
+        <property name="user" value="root" />
+        <property name="password" value="root" />
+
+        <!-- C3P0 properties -->
+        <property name="acquireIncrement" value="5" />
+        <property name="minPoolSize" value="5" />
+        <property name="maxPoolSize" value="20" />
+        <property name="maxIdleTime" value="1800" />
+        <property name="maxStatements" value="50"/>
     </bean>
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <constructor-arg ref="dataSource"/>
+
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.use_sql_comments">true</prop>
+                <prop key="hibernate.auto_close_session">true</prop>
+            </props>
+        </property>
     </bean>
+
+    <!--Dao-->
+    <bean id="daoFactory" class="by.itstart.hibernate.HibernateDaoFactory"/>
 
     <bean  id="markDao" factory-bean="daoFactory" factory-method="getDao" destroy-method="closeDao">
-        <constructor-arg>
-            <bean factory-bean="dataSource" factory-method="getConnection" destroy-method="close"/>
-        </constructor-arg>
+        <constructor-arg ref="sessionFactory"/>
         <constructor-arg value="by.itstart.dto.Mark"/>
     </bean>
     <bean id="subjectDao" factory-bean="daoFactory" factory-method="getDao" destroy-method="closeDao">
-        <constructor-arg>
-            <bean factory-bean="dataSource" factory-method="getConnection" destroy-method="close"/>
-        </constructor-arg>
+        <constructor-arg ref="sessionFactory"/>
         <constructor-arg value="by.itstart.dto.Subject"/>
     </bean>
     <bean id="studentDao" factory-bean="daoFactory" factory-method="getDao" destroy-method="closeDao">
-        <constructor-arg>
-            <bean factory-bean="dataSource" factory-method="getConnection" destroy-method="close"/>
-        </constructor-arg>
+        <constructor-arg ref="sessionFactory"/>
         <constructor-arg value="by.itstart.dto.Student"/>
     </bean>
 
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
     <tx:annotation-driven transaction-manager="transactionManager"/>
 </beans>

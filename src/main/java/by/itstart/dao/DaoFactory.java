@@ -1,14 +1,12 @@
 package by.itstart.dao;
 
-import java.sql.Connection;
+import org.hibernate.SessionFactory;
 
 public interface DaoFactory {
 
-    interface DaoCreater {
-        GenericDao create(Connection connection);
+    interface DaoCreator {
+        GenericDao create(SessionFactory sessionFactory);
     }
 
-    Connection getConnection() throws DaoException;
-
-    GenericDao getDao(Connection connection, Class dtoClass);
+    GenericDao getDao(SessionFactory sessionFactory, Class dtoClass);
 }
