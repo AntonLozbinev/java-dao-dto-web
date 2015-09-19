@@ -3,6 +3,7 @@ package by.itstart.dto;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.json.JSONObject;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -76,5 +77,14 @@ public class Mark implements Serializable{
         int result = id;
         result = 31 * result + mark;
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return id + ". " + mark;
+    }
+
+    public JSONObject toJsonObject() {
+        return new JSONObject(this);
     }
 }

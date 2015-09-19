@@ -5,6 +5,8 @@ import by.itstart.dao.DaoException;
 import by.itstart.dto.Student;
 import by.itstart.dto.Subject;
 import by.itstart.hibernate.HibernateSubjectDao;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -39,7 +41,6 @@ public class RequestHandlerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        requestHandler(req, resp);
         formsHandler(req, resp);
     }
 
@@ -157,7 +158,7 @@ public class RequestHandlerServlet extends HttpServlet {
             subjectDao.update(subject);
             req.setAttribute("result", "<p>Subject with id" + id + " was updated</p>");
             req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
-        } catch (Exception e) {
+        } catch (DaoException | NumberFormatException | ServletException e) {
             out.println("<p>Can not update subject</p>");
             out.println("<a href='../index.jsp'>На главную</a>");
         } finally {
@@ -189,20 +190,24 @@ public class RequestHandlerServlet extends HttpServlet {
     }
 
     private void show (HttpServletRequest req, HttpServletResponse resp, String daoType) throws IOException, DaoException {
-        resp.setContentType("text/html;charset=utf-8");
+        resp.setContentType("application/x-json;charset=utf-8");
         PrintWriter out = resp.getWriter();
         try {
             int id = Integer.parseInt(req.getParameter("id"));
+            JSONObject jsonObject = new JSONObject();
             if (daoType.startsWith("student")) {
-                req.setAttribute("object", studentDao.read(id));
+                Student student = (Student) studentDao.read(id);
+                jsonObject.put("operation", "student");
+                jsonObject.put("students", new JSONArray().put(student.toJsonObject()));
             }
             if (daoType.startsWith("subject")) {
-                req.setAttribute("object", subjectDao.read(id));
+                Subject subject = (Subject) subjectDao.read(id);
+                jsonObject.put("operation", "subject");
+                jsonObject.put("subjects", new JSONArray().put(subject.toJsonObject()));
             }
-            req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
-        } catch (DaoException | NumberFormatException | ServletException e) {
-            out.println("<p>Can not select object</p>");
-            out.println("<a href='index.jsp'>На главную</a>");
+            out.print(jsonObject);
+        } catch (DaoException | NumberFormatException e) {
+            out.print(new JSONObject().put("operation", "error").put("exception", "Can not select object"));
         } finally {
             out.close();
         }
@@ -211,20 +216,29 @@ public class RequestHandlerServlet extends HttpServlet {
     private void showAll(HttpServletRequest req, HttpServletResponse resp, String daoType) throws IOException, DaoException {
         resp.setContentType("text/html;charset=utf-8");
         PrintWriter out = resp.getWriter();
-        List<? extends Object> objects = null;
+        JSONObject jsonObject = new JSONObject();
+        JSONArray array = new JSONArray();
         try {
             if (daoType.startsWith("student")) {
-                objects =  studentDao.getAll();
+                jsonObject.put("operation", "student");
+                List<Student> students =  studentDao.getAll();
+                for (Student student : students) {
+                    array.put(student.toJsonObject());
+                }
+                jsonObject.put("students", array);
             }
             if (daoType.startsWith("subject")) {
                 int id = Integer.parseInt(req.getParameter("id"));
-                objects = subjectDao.getAllByStudentId(id);
+                jsonObject.put("operation", "subject");
+                List<Subject> subjects = subjectDao.getAllByStudentId(id);
+                for (Subject subject : subjects) {
+                    array.put(subject.toJsonObject());
+                }
+                jsonObject.put("subjects", array);
             }
-            req.setAttribute("objects", objects);
-            req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
-        } catch (DaoException | NumberFormatException | ServletException e) {
-            out.println("<p>Can not select all</p>");
-            out.println("<a href='index.jsp'>На главную</a>");
+            out.print(jsonObject);
+        } catch (DaoException | NumberFormatException e) {
+            out.print(new JSONObject().put("operation", "error").put("exception", "Can not select all"));
         } finally {
             out.close();
         }
@@ -241,12 +255,9 @@ public class RequestHandlerServlet extends HttpServlet {
             if (daoType.startsWith("subject")) {
                 subjectDao.delete(id);
             }
-            req.setAttribute("result", "<p>Object with id" + id + " was deleted</p>");
-            req.getRequestDispatcher("/views/viewResult.jsp").forward(req, resp);
-        } catch (Exception e) {
-            out.print(e.getMessage());
-            out.println("<p>Can not delete student</p>");
-            out.println("<a href='index.jsp'>На главную</a>");
+            out.print(new JSONObject().put("operation", "delete").put("delete", "Object with id" + id + " was deleted"));
+        } catch (DaoException | NumberFormatException e) {
+            out.print(new JSONObject().put("operation", "error").put("exception", "Can not delete object"));
         }finally {
             out.close();
         }

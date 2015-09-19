@@ -1,11 +1,14 @@
 package by.itstart.dto;
 
 import org.hibernate.annotations.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,7 +18,7 @@ public class Subject implements Serializable{
     private Integer id = null;
     private String title;
     private Integer studentId;
-    private List<Mark> marks;
+    private List<Mark> marks = new ArrayList<>(0);
 
     public Subject() {
     }
@@ -87,5 +90,9 @@ public class Subject implements Serializable{
         int result = id;
         result = 31 * result + (title != null ? title.hashCode() : 0);
         return result;
+    }
+
+    public JSONObject toJsonObject() {
+        return new JSONObject(this);
     }
 }
